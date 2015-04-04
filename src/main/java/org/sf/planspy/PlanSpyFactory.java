@@ -11,10 +11,12 @@ import java.sql.SQLException;
 
 public class PlanSpyFactory implements P6Factory {
 
+    public static final String activationMsg = "PlanSpyFactory active";
+
     @Override
     public Connection getConnection(Connection conn) throws SQLException {
         PlanSpyConnectionInvocationHandler invocationHandler = new PlanSpyConnectionInvocationHandler(conn);
-        P6LogQuery.getLogger().logText("hello world");
+        P6LogQuery.getLogger().logText(activationMsg);
         return ProxyFactory.createProxy(conn, invocationHandler);
     }
 
