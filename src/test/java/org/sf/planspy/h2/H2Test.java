@@ -31,7 +31,9 @@ public class H2Test {
         Class.forName(P6SpyConstants.P6SPY_JDBC_DRIVER);
         conn = DriverManager.getConnection("jdbc:p6spy:h2:mem:", "sa", "");
 
+
     }
+
 
     @After
     public void closeConnectionAndCleanUpStreams() throws SQLException {
@@ -44,11 +46,144 @@ public class H2Test {
     }
 
     @Test
-    public void testH2Connection() throws SQLException {
+    public void generateSimpleExecutionPlan() throws SQLException {
+
+
         Statement stmt = conn.createStatement();
-        stmt.executeQuery("select 1");
+
+        stmt.execute("create table dept(\n" +
+                "  deptno number(2,0),\n" +
+                "  dname  varchar2(14),\n" +
+                "  loc    varchar2(13),\n" +
+                "  constraint pk_dept primary key (deptno)\n" +
+                ");\n" +
+                " \n");
+        stmt.execute("create table emp(\n" +
+                "  empno    number(4,0),\n" +
+                "  ename    varchar2(10),\n" +
+                "  job      varchar2(9),\n" +
+                "  mgr      number(4,0),\n" +
+                "  hiredate date,\n" +
+                "  sal      number(7,2),\n" +
+                "  comm     number(7,2),\n" +
+                "  deptno   number(2,0),\n" +
+                "  constraint pk_emp primary key (empno),\n" +
+                "  constraint fk_deptno foreign key (deptno) references dept (deptno)\n" +
+                ");");
+
+        stmt.executeUpdate("insert into dept\n" +
+                "values(10, 'ACCOUNTING', 'NEW YORK');\n");
+        stmt.executeUpdate("insert into dept\n" +
+                "values(20, 'RESEARCH', 'DALLAS');\n");
+        stmt.executeUpdate("insert into dept\n" +
+                "values(30, 'SALES', 'CHICAGO');\n");
+        stmt.executeUpdate("insert into dept\n" +
+                "values(40, 'OPERATIONS', 'BOSTON');\n" +
+                " \n");
+        /* stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7839, 'KING', 'PRESIDENT', null,\n" +
+                " to_date('17-11-1981','dd-mm-yyyy'),\n" +
+                " 5000, null, 10\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7698, 'BLAKE', 'MANAGER', 7839,\n" +
+                " to_date('1-5-1981','dd-mm-yyyy'),\n" +
+                " 2850, null, 30\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7782, 'CLARK', 'MANAGER', 7839,\n" +
+                " to_date('9-6-1981','dd-mm-yyyy'),\n" +
+                " 2450, null, 10\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7566, 'JONES', 'MANAGER', 7839,\n" +
+                " to_date('2-4-1981','dd-mm-yyyy'),\n" +
+                " 2975, null, 20\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7788, 'SCOTT', 'ANALYST', 7566,\n" +
+                " to_date('13-JUL-87','dd-mm-rr') - 85,\n" +
+                " 3000, null, 20\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7902, 'FORD', 'ANALYST', 7566,\n" +
+                " to_date('3-12-1981','dd-mm-yyyy'),\n" +
+                " 3000, null, 20\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7369, 'SMITH', 'CLERK', 7902,\n" +
+                " to_date('17-12-1980','dd-mm-yyyy'),\n" +
+                " 800, null, 20\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7499, 'ALLEN', 'SALESMAN', 7698,\n" +
+                " to_date('20-2-1981','dd-mm-yyyy'),\n" +
+                " 1600, 300, 30\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7521, 'WARD', 'SALESMAN', 7698,\n" +
+                " to_date('22-2-1981','dd-mm-yyyy'),\n" +
+                " 1250, 500, 30\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7654, 'MARTIN', 'SALESMAN', 7698,\n" +
+                " to_date('28-9-1981','dd-mm-yyyy'),\n" +
+                " 1250, 1400, 30\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7844, 'TURNER', 'SALESMAN', 7698,\n" +
+                " to_date('8-9-1981','dd-mm-yyyy'),\n" +
+                " 1500, 0, 30\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7876, 'ADAMS', 'CLERK', 7788,\n" +
+                " to_date('13-JUL-87', 'dd-mm-rr') - 51,\n" +
+                " 1100, null, 20\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7900, 'JAMES', 'CLERK', 7698,\n" +
+                " to_date('3-12-1981','dd-mm-yyyy'),\n" +
+                " 950, null, 30\n" +
+                ");\n" +
+                "insert into emp\n" +
+                "values(\n" +
+                " 7934, 'MILLER', 'CLERK', 7782,\n" +
+                " to_date('23-1-1982','dd-mm-yyyy'),\n" +
+                " 1300, null, 10\n" +
+                ");\n" +
+                " \n" +
+                "/*\n" +
+                "insert into salgrade\n" +
+                "values (1, 700, 1200);\n" +
+                "insert into salgrade\n" +
+                "values (2, 1201, 1400);\n" +
+                "insert into salgrade\n" +
+                "values (3, 1401, 2000);\n" +
+                "insert into salgrade\n" +
+                "values (4, 2001, 3000);\n" +
+                "insert into salgrade\n" +
+                "values (5, 3001, 9999);\n" +
+                "\n" +
+                "\n" +
+                "commit;");*/
+
+        stmt.executeQuery("select * from dept, emp");
         stmt.close();
 
-        assertThat(outContent.toString(), containsString(PlanSpyFactory.activationMsg));
+        assertThat("planspy activation message not found", outContent.toString(), containsString(PlanSpyFactory.activationMsg));
+        assertThat("key word not found", outContent.toString(), containsString("tableScan"));
     }
 }

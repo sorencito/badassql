@@ -1,11 +1,13 @@
 package org.sf.planspy;
 
+import com.p6spy.engine.common.P6LogQuery;
 import com.p6spy.engine.common.StatementInformation;
 import com.p6spy.engine.proxy.Delegate;
 import com.p6spy.engine.proxy.ProxyFactory;
 
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 class PlanSpyStatementExecuteDelegate implements Delegate {
     private final StatementInformation statementInformation;
@@ -27,7 +29,11 @@ class PlanSpyStatementExecuteDelegate implements Delegate {
             }
             return result;
         } finally {
-//            P6LogQuery.logElapsed(statementInformation.getConnectionId(), startTime, Category.STATEMENT, statementInformation);
+            if (!args[0].toString().toUpperCase().contains("CREATE")) {
+                ResultSet s = ((Statement) underlying).getConnection().createStatement().executeQuery("EXPLAIN " + args[0]);
+                s.next();
+                P6LogQuery.getLogger().logText(s.getString(1));
+            }
         }
     }
 }
