@@ -7,6 +7,7 @@ import com.p6spy.engine.proxy.ProxyFactory;
 
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 class PlanSpyStatementExecuteDelegate implements Delegate {
@@ -29,10 +30,12 @@ class PlanSpyStatementExecuteDelegate implements Delegate {
             }
             return result;
         } finally {
-            if (!args[0].toString().toUpperCase().contains("CREATE")) {
+            try {
                 ResultSet s = ((Statement) underlying).getConnection().createStatement().executeQuery("EXPLAIN " + args[0]);
                 s.next();
                 P6LogQuery.getLogger().logText(s.getString(1));
+            } catch (SQLException e) {
+                // intentionally blank
             }
         }
     }

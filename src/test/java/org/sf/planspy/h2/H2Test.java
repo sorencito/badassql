@@ -31,7 +31,32 @@ public class H2Test {
         Class.forName(P6SpyConstants.P6SPY_JDBC_DRIVER);
         conn = DriverManager.getConnection("jdbc:p6spy:h2:mem:", "sa", "");
 
+        prepareDatabase();
 
+    }
+
+    private void prepareDatabase() throws SQLException {
+        Statement stmt = conn.createStatement();
+
+        createFunctions(stmt);
+
+        createTables(stmt);
+
+        insertData(stmt);
+
+        stmt.close();
+    }
+
+    private void createFunctions(Statement stmt) throws SQLException {
+        stmt.execute("-- TO_DATE \n" +
+                "drop ALIAS if exists TO_DATE; \n" +
+                "CREATE ALIAS TO_DATE as '\n" +
+                "import java.text.*;\n" +
+                "@CODE\n" +
+                "java.util.Date toDate(String s, String dateFormat) throws Exception { \n" +
+                "  return new SimpleDateFormat(dateFormat).parse(s); \n" +
+                "} \n" +
+                "';");
     }
 
 
@@ -48,9 +73,113 @@ public class H2Test {
     @Test
     public void generateSimpleExecutionPlan() throws SQLException {
 
-
         Statement stmt = conn.createStatement();
 
+        stmt.executeQuery("select * from dept, emp");
+        stmt.close();
+
+        assertThat("planspy activation message not found", outContent.toString(), containsString(PlanSpyFactory.activationMsg));
+        assertThat("key word not found", outContent.toString(), containsString("tableScan"));
+    }
+
+    private void insertData(Statement stmt) throws SQLException {
+        stmt.executeUpdate("insert into dept\n" +
+                "values(10, 'ACCOUNTING', 'NEW YORK');\n");
+        stmt.executeUpdate("insert into dept\n" +
+                "values(20, 'RESEARCH', 'DALLAS');\n");
+        stmt.executeUpdate("insert into dept\n" +
+                "values(30, 'SALES', 'CHICAGO');\n");
+        stmt.executeUpdate("insert into dept\n" +
+                "values(40, 'OPERATIONS', 'BOSTON');\n" +
+                " \n");
+
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7839, 'KING', 'PRESIDENT', null,\n" +
+                " to_date('17-11-1981','dd-mm-yyyy'),\n" +
+                " 5000, null, 10\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7698, 'BLAKE', 'MANAGER', 7839,\n" +
+                " to_date('1-5-1981','dd-mm-yyyy'),\n" +
+                " 2850, null, 30\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7782, 'CLARK', 'MANAGER', 7839,\n" +
+                " to_date('9-6-1981','dd-mm-yyyy'),\n" +
+                " 2450, null, 10\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7566, 'JONES', 'MANAGER', 7839,\n" +
+                " to_date('2-4-1981','dd-mm-yyyy'),\n" +
+                " 2975, null, 20\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7788, 'SCOTT', 'ANALYST', 7566,\n" +
+                " to_date('13-07-1987','dd-mm-yyyy') - 85,\n" +
+                " 3000, null, 20\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7902, 'FORD', 'ANALYST', 7566,\n" +
+                " to_date('3-12-1981','dd-mm-yyyy'),\n" +
+                " 3000, null, 20\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7369, 'SMITH', 'CLERK', 7902,\n" +
+                " to_date('17-12-1980','dd-mm-yyyy'),\n" +
+                " 800, null, 20\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7499, 'ALLEN', 'SALESMAN', 7698,\n" +
+                " to_date('20-2-1981','dd-mm-yyyy'),\n" +
+                " 1600, 300, 30\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7521, 'WARD', 'SALESMAN', 7698,\n" +
+                " to_date('22-2-1981','dd-mm-yyyy'),\n" +
+                " 1250, 500, 30\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7654, 'MARTIN', 'SALESMAN', 7698,\n" +
+                " to_date('28-9-1981','dd-mm-yyyy'),\n" +
+                " 1250, 1400, 30\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7844, 'TURNER', 'SALESMAN', 7698,\n" +
+                " to_date('8-9-1981','dd-mm-yyyy'),\n" +
+                " 1500, 0, 30\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7876, 'ADAMS', 'CLERK', 7788,\n" +
+                " to_date('13-07-1987', 'dd-mm-yyyy') - 51,\n" +
+                " 1100, null, 20\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7900, 'JAMES', 'CLERK', 7698,\n" +
+                " to_date('3-12-1981','dd-mm-yyyy'),\n" +
+                " 950, null, 30\n" +
+                ");\n");
+        stmt.executeUpdate("insert into emp\n" +
+                "values(\n" +
+                " 7934, 'MILLER', 'CLERK', 7782,\n" +
+                " to_date('23-1-1982','dd-mm-yyyy'),\n" +
+                " 1300, null, 10\n" +
+                ");\n");
+    }
+
+    private void createTables(Statement stmt) throws SQLException {
         stmt.execute("create table dept(\n" +
                 "  deptno number(2,0),\n" +
                 "  dname  varchar2(14),\n" +
@@ -70,120 +199,5 @@ public class H2Test {
                 "  constraint pk_emp primary key (empno),\n" +
                 "  constraint fk_deptno foreign key (deptno) references dept (deptno)\n" +
                 ");");
-
-        stmt.executeUpdate("insert into dept\n" +
-                "values(10, 'ACCOUNTING', 'NEW YORK');\n");
-        stmt.executeUpdate("insert into dept\n" +
-                "values(20, 'RESEARCH', 'DALLAS');\n");
-        stmt.executeUpdate("insert into dept\n" +
-                "values(30, 'SALES', 'CHICAGO');\n");
-        stmt.executeUpdate("insert into dept\n" +
-                "values(40, 'OPERATIONS', 'BOSTON');\n" +
-                " \n");
-        /* stmt.executeUpdate("insert into emp\n" +
-                "values(\n" +
-                " 7839, 'KING', 'PRESIDENT', null,\n" +
-                " to_date('17-11-1981','dd-mm-yyyy'),\n" +
-                " 5000, null, 10\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7698, 'BLAKE', 'MANAGER', 7839,\n" +
-                " to_date('1-5-1981','dd-mm-yyyy'),\n" +
-                " 2850, null, 30\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7782, 'CLARK', 'MANAGER', 7839,\n" +
-                " to_date('9-6-1981','dd-mm-yyyy'),\n" +
-                " 2450, null, 10\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7566, 'JONES', 'MANAGER', 7839,\n" +
-                " to_date('2-4-1981','dd-mm-yyyy'),\n" +
-                " 2975, null, 20\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7788, 'SCOTT', 'ANALYST', 7566,\n" +
-                " to_date('13-JUL-87','dd-mm-rr') - 85,\n" +
-                " 3000, null, 20\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7902, 'FORD', 'ANALYST', 7566,\n" +
-                " to_date('3-12-1981','dd-mm-yyyy'),\n" +
-                " 3000, null, 20\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7369, 'SMITH', 'CLERK', 7902,\n" +
-                " to_date('17-12-1980','dd-mm-yyyy'),\n" +
-                " 800, null, 20\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7499, 'ALLEN', 'SALESMAN', 7698,\n" +
-                " to_date('20-2-1981','dd-mm-yyyy'),\n" +
-                " 1600, 300, 30\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7521, 'WARD', 'SALESMAN', 7698,\n" +
-                " to_date('22-2-1981','dd-mm-yyyy'),\n" +
-                " 1250, 500, 30\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7654, 'MARTIN', 'SALESMAN', 7698,\n" +
-                " to_date('28-9-1981','dd-mm-yyyy'),\n" +
-                " 1250, 1400, 30\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7844, 'TURNER', 'SALESMAN', 7698,\n" +
-                " to_date('8-9-1981','dd-mm-yyyy'),\n" +
-                " 1500, 0, 30\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7876, 'ADAMS', 'CLERK', 7788,\n" +
-                " to_date('13-JUL-87', 'dd-mm-rr') - 51,\n" +
-                " 1100, null, 20\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7900, 'JAMES', 'CLERK', 7698,\n" +
-                " to_date('3-12-1981','dd-mm-yyyy'),\n" +
-                " 950, null, 30\n" +
-                ");\n" +
-                "insert into emp\n" +
-                "values(\n" +
-                " 7934, 'MILLER', 'CLERK', 7782,\n" +
-                " to_date('23-1-1982','dd-mm-yyyy'),\n" +
-                " 1300, null, 10\n" +
-                ");\n" +
-                " \n" +
-                "/*\n" +
-                "insert into salgrade\n" +
-                "values (1, 700, 1200);\n" +
-                "insert into salgrade\n" +
-                "values (2, 1201, 1400);\n" +
-                "insert into salgrade\n" +
-                "values (3, 1401, 2000);\n" +
-                "insert into salgrade\n" +
-                "values (4, 2001, 3000);\n" +
-                "insert into salgrade\n" +
-                "values (5, 3001, 9999);\n" +
-                "\n" +
-                "\n" +
-                "commit;");*/
-
-        stmt.executeQuery("select * from dept, emp");
-        stmt.close();
-
-        assertThat("planspy activation message not found", outContent.toString(), containsString(PlanSpyFactory.activationMsg));
-        assertThat("key word not found", outContent.toString(), containsString("tableScan"));
     }
 }
