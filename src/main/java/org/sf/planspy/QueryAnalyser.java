@@ -1,7 +1,9 @@
 package org.sf.planspy;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class QueryAnalyser {
     private QueryInformation queryInformation;
@@ -12,8 +14,11 @@ public class QueryAnalyser {
     }
 
     public void run() {
+        Connection connection = queryInformation.getConnection();
+        Statement statement = null;
         try {
-            ResultSet s = queryInformation.getConnection().createStatement().executeQuery("EXPLAIN " + queryInformation.getStatement());
+            statement = connection.createStatement();
+            ResultSet s = statement.executeQuery("EXPLAIN " + queryInformation.getStatement());
 
             if (s != null) {
                 s.next();
@@ -21,6 +26,16 @@ public class QueryAnalyser {
             }
         } catch (SQLException e) {
             // swallow
+            e.printStackTrace();
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+            } catch (SQLException e) {
+                // swallow
+                e.printStackTrace();
+            }
         }
     }
 
