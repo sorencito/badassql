@@ -6,9 +6,9 @@ public class QueryInformation {
     private Connection connection;
     private String statement;
 
-    public QueryInformation(Connection connection, String arg) {
+    public QueryInformation(Connection connection, String statement) {
         this.connection = connection;
-        this.statement = arg;
+        this.statement = statement;
     }
 
     public Connection getConnection() {

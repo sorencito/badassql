@@ -1,11 +1,15 @@
 package org.sf.planspy;
 
+import org.sf.planspy.h2.H2SQLProvider;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class QueryAnalyser {
+public class QueryAnalyser implements SQLProvider {
+
+    private final H2SQLProvider h2SQLProvider = new H2SQLProvider();
     private QueryInformation queryInformation;
     private String plan;
 
@@ -18,7 +22,7 @@ public class QueryAnalyser {
         Statement statement = null;
         try {
             statement = connection.createStatement();
-            ResultSet s = statement.executeQuery("EXPLAIN " + queryInformation.getStatement());
+            ResultSet s = statement.executeQuery(h2SQLProvider.getSQLProvidingExecPlan(queryInformation));
 
             if (s != null) {
                 s.next();
@@ -37,6 +41,11 @@ public class QueryAnalyser {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public String getSQLProvidingExecPlan(QueryInformation queryInformation) {
+        return h2SQLProvider.getSQLProvidingExecPlan(queryInformation);
     }
 
     public boolean hasPlanBeenProduced() {
