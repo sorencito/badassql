@@ -1,8 +1,17 @@
 package org.sf.planspy;
 
+import com.p6spy.engine.common.StatementInformation;
+
 /**
- * Created by Sören on 28.04.2015.
+ * Extension point for different databases.
  */
 public interface SQLProvider {
-    String getSQLProvidingExecPlan(QueryInformation queryInformation);
+    /**
+     * Returns the final SQL which will subsequently be used for querying the database for the execution plan for the
+     * specific database.
+     *
+     * @param statementInformation the statementInformation
+     * @return the SQL providing the execution plan for the specific database
+     */
+    String getSQLProvidingExecPlan(StatementInformation statementInformation);
 }

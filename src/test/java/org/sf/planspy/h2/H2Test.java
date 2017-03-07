@@ -3,15 +3,11 @@ package org.sf.planspy.h2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sf.planspy.P6SpyConstants;
 import org.sf.planspy.PlanSpyFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
@@ -28,7 +24,7 @@ public class H2Test {
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
 
-        Class.forName(P6SpyConstants.P6SPY_JDBC_DRIVER);
+        Class.forName("com.p6spy.engine.spy.P6SpyDriver");
         conn = DriverManager.getConnection("jdbc:p6spy:h2:mem:", "sa", "");
 
         prepareDatabase();
@@ -71,14 +67,19 @@ public class H2Test {
     }
 
     @Test
-    public void generateSimpleExecutionPlan() throws SQLException {
-
+    public void generateSimpleExecutionPlanSelect() throws SQLException {
         Statement stmt = conn.createStatement();
-
         stmt.executeQuery("select * from dept, emp");
         stmt.close();
+        assertThat("key word not found", outContent.toString(), containsString("tableScan"));
+    }
 
-        assertThat("planspy activation message not found", outContent.toString(), containsString(PlanSpyFactory.activationMsg));
+    @Test
+    public void generatePreparedStatementExecutionPlanSelect() throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("select * from dept, emp where rownum > " + "?");
+        stmt.setInt(1, 0);
+        ResultSet set = stmt.executeQuery();
+        stmt.close();
         assertThat("key word not found", outContent.toString(), containsString("tableScan"));
     }
 

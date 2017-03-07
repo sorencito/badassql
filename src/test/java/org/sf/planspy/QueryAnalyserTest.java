@@ -1,5 +1,7 @@
 package org.sf.planspy;
 
+import com.p6spy.engine.common.ConnectionInformation;
+import com.p6spy.engine.common.StatementInformation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +30,7 @@ public class QueryAnalyserTest {
 
     @Test
     public void test_empty_query_information_doesnt_produce_plan() {
-        QueryAnalyser analyser = new QueryAnalyser(new QueryInformation(mockedConnection, ""));
+        QueryAnalyser analyser = new QueryAnalyser(new StatementInformation(ConnectionInformation.fromDriver(null, mockedConnection, 0)));
         analyser.run();
 
         assertFalse(analyser.hasPlanBeenProduced());
