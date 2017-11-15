@@ -2,8 +2,6 @@ package org.sf.planspy;
 
 import com.p6spy.engine.common.P6LogQuery;
 import com.p6spy.engine.common.StatementInformation;
-import com.p6spy.engine.wrapper.ConnectionWrapper;
-import org.sf.planspy.h2.H2SQLProvider;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -15,13 +13,26 @@ import java.sql.Statement;
  */
 class QueryAnalyser {
 
-    // TODO: now this should be configurable, just making things work
-    private final H2SQLProvider sqlProvider = new H2SQLProvider();
+    private SQLProvider sqlProvider;
+
     private StatementInformation statementInformation;
     private String plan;
 
     QueryAnalyser(StatementInformation queryInformation) {
         this.statementInformation = queryInformation;
+        try {
+            sqlProvider = (SQLProvider) this.getClass().getClassLoader().loadClass(PlanSpyOptions.sqlProvider).newInstance();
+        } catch (InstantiationException e) {
+            logErrorSQLProvider(e);
+        } catch (IllegalAccessException e) {
+            logErrorSQLProvider(e);
+        } catch (ClassNotFoundException e) {
+            logErrorSQLProvider(e);
+        }
+    }
+
+    private void logErrorSQLProvider(Exception e) {
+        P6LogQuery.error("couldn't load SQL provider: " + sqlProvider + ", " + e.toString());
     }
 
     void run() {
@@ -59,5 +70,11 @@ class QueryAnalyser {
 
     String getPlan() {
         return plan;
+    }
+
+    String getSQLProviderClass() {
+        if (sqlProvider != null)
+            return sqlProvider.getClass().getCanonicalName();
+        else return null;
     }
 }

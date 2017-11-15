@@ -3,6 +3,7 @@ package org.sf.planspy;
 import com.p6spy.engine.common.ConnectionInformation;
 import com.p6spy.engine.common.StatementInformation;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;

@@ -1,22 +1,24 @@
-package org.sf.planspy.h2;
+package org.sf.planspy.postgres;
 
 import com.p6spy.engine.common.StatementInformation;
 import org.sf.planspy.SQLExtractor;
 import org.sf.planspy.SQLProvider;
 
 /**
- * Provides plans for the H2 Database, version 1.4
+ * Provides plans for the Postgres Database, version 9.1
  */
-public class H2SQLProvider implements SQLProvider {
+public class PostgresSQLProvider implements SQLProvider {
 
     @Override
     public String getSQLProvidingExecPlan(StatementInformation statementInformation) {
         String uppercaseSql = SQLExtractor.getSQL(statementInformation);
 
         if (uppercaseSql.startsWith("SELECT")) {
-            return "EXPLAIN " + uppercaseSql;
+            return "EXPLAIN ANALYZE " + uppercaseSql;
         } else {
             return null;
         }
     }
+
+
 }
