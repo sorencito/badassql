@@ -1,4 +1,4 @@
-package org.sf.planspy;
+package org.sf.badassql;
 
 import com.p6spy.engine.common.P6LogQuery;
 import com.p6spy.engine.common.StatementInformation;
@@ -21,7 +21,7 @@ class QueryAnalyser {
     QueryAnalyser(StatementInformation queryInformation) {
         this.statementInformation = queryInformation;
         try {
-            sqlProvider = (SQLProvider) this.getClass().getClassLoader().loadClass(PlanSpyOptions.sqlProvider).newInstance();
+            sqlProvider = (SQLProvider) this.getClass().getClassLoader().loadClass(BadasSQLOptions.sqlProvider).newInstance();
         } catch (InstantiationException e) {
             logErrorSQLProvider(e);
         } catch (IllegalAccessException e) {

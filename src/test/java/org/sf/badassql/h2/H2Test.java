@@ -1,9 +1,9 @@
-package org.sf.planspy.h2;
+package org.sf.badassql.h2;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sf.planspy.PlanSpyFactory;
+import org.sf.badassql.BadasSQLFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

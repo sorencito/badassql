@@ -1,4 +1,4 @@
-package org.sf.planspy;
+package org.sf.badassql;
 
 import com.p6spy.engine.common.ConnectionInformation;
 import com.p6spy.engine.common.StatementInformation;

@@ -1,4 +1,4 @@
-# planspy
+# badassql
 Adds execution plan support for some popular databases to p6spy. It's an extension to p6spy, so it will not work without it.
 
 This is work in progress. 

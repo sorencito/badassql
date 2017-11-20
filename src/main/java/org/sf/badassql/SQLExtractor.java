@@ -1,10 +1,10 @@
-package org.sf.planspy;
+package org.sf.badassql;
 
 import com.p6spy.engine.common.StatementInformation;
 
 public class SQLExtractor {
 
-    public static String getSQL(StatementInformation statementInformation) {
+    public static String extractSQL(StatementInformation statementInformation) {
         String sql = null;
 
         if (statementInformation.getSqlWithValues() != null) {

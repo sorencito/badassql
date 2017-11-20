@@ -1,8 +1,8 @@
-package org.sf.planspy.postgres;
+package org.sf.badassql.postgres;
 
 import com.p6spy.engine.common.StatementInformation;
-import org.sf.planspy.SQLExtractor;
-import org.sf.planspy.SQLProvider;
+import org.sf.badassql.SQLExtractor;
+import org.sf.badassql.SQLProvider;
 
 /**
  * Provides plans for the Postgres Database, version 9.1
@@ -11,7 +11,7 @@ public class PostgresSQLProvider implements SQLProvider {
 
     @Override
     public String getSQLProvidingExecPlan(StatementInformation statementInformation) {
-        String uppercaseSql = SQLExtractor.getSQL(statementInformation);
+        String uppercaseSql = SQLExtractor.extractSQL(statementInformation);
 
         if (uppercaseSql.startsWith("SELECT")) {
             return "EXPLAIN ANALYZE " + uppercaseSql;

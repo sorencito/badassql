@@ -1,4 +1,4 @@
-package org.sf.planspy;
+package org.sf.badassql;
 
 import com.p6spy.engine.common.CallableStatementInformation;
 import com.p6spy.engine.common.P6LogQuery;
@@ -11,11 +11,11 @@ import java.sql.SQLException;
 /**
 * Finally triggers the @{@link QueryAnalyser}.
 */
-public class PlanSpyJdbcEventListener extends SimpleJdbcEventListener {
+public class BadasSQLJdbcEventListener extends SimpleJdbcEventListener {
 
-    static final PlanSpyJdbcEventListener INSTANCE = new PlanSpyJdbcEventListener();
+    static final BadasSQLJdbcEventListener INSTANCE = new BadasSQLJdbcEventListener();
 
-    private PlanSpyJdbcEventListener() {
+    private BadasSQLJdbcEventListener() {
     }
 
     @Override

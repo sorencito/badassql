@@ -1,4 +1,4 @@
-package org.sf.planspy.tools;
+package org.sf.badassql.tools;
 
 import com.p6spy.engine.spy.P6ModuleManager;
 
@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class P6Resetter {
+
     public static void resetP6() {
         Method initMe = null;
         try {
@@ -13,12 +14,14 @@ public class P6Resetter {
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-        initMe.setAccessible(true);
+        if (initMe != null) {
+            initMe.setAccessible(true);
+        }else {
+            throw new IllegalStateException("seems like the #initMe method disappeared in a new version of P6Spy (at the time of coding 3.5.1)");
+        }
         try {
-            initMe.invoke(P6ModuleManager.class, null);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+            initMe.invoke(P6ModuleManager.class);
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
