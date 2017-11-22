@@ -7,23 +7,31 @@ import javax.management.StandardMBean;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The options found here can be used just as all other P6Spy Options either in the spy.properties or system properties.
+ */
 public class BadasSQLOptions extends StandardMBean implements BadasSQLOptionsMBean, P6LoadableOptions {
 
     public static final String SQLPROVIDER = "sqlprovider";
-    public static String sqlProvider;
-    private P6OptionsRepository optionsRepository;
+    public static final String REGEX1 = "regex1";
 
+    private static Map<String, String> PROPERTIES = new HashMap<>();
 
     public BadasSQLOptions(P6OptionsRepository optionsRepository) {
         super(BadasSQLOptionsMBean.class, false);
-        this.optionsRepository = optionsRepository;
     }
 
     @Override
     public void load(Map<String, String> options) {
-        if (options != null)
-            if (options.get(SQLPROVIDER) != null)
-                sqlProvider = options.get(SQLPROVIDER);
+        if (options == null)
+            return;
+
+        if (options.get(SQLPROVIDER) != null) {
+            PROPERTIES.put(SQLPROVIDER, options.get(SQLPROVIDER));
+        }
+
+        if (options.get(REGEX1) != null)
+            PROPERTIES.put(REGEX1, options.get(REGEX1));
     }
 
     @Override
@@ -34,4 +42,11 @@ public class BadasSQLOptions extends StandardMBean implements BadasSQLOptionsMBe
         return map;
     }
 
+    public static String getProperty(String property) {
+        return PROPERTIES.get(property);
+    }
+
+    public static void resetAll() {
+        PROPERTIES = new HashMap<>();
+    }
 }

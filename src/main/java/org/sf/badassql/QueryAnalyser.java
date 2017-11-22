@@ -21,7 +21,8 @@ class QueryAnalyser {
     QueryAnalyser(StatementInformation queryInformation) {
         this.statementInformation = queryInformation;
         try {
-            sqlProvider = (SQLProvider) this.getClass().getClassLoader().loadClass(BadasSQLOptions.sqlProvider).newInstance();
+            String sqlProviderClassname = BadasSQLOptions.getProperty(BadasSQLOptions.SQLPROVIDER);
+            sqlProvider = (SQLProvider) this.getClass().getClassLoader().loadClass(sqlProviderClassname).newInstance();
         } catch (InstantiationException e) {
             logErrorSQLProvider(e);
         } catch (IllegalAccessException e) {
@@ -36,13 +37,27 @@ class QueryAnalyser {
     }
 
     void run() {
-        String planSql = sqlProvider.getSQLProvidingExecPlan(statementInformation);
-        if (planSql == null) return;
+        staticAnalysis();
+        dynamicAnalysis();
+    }
 
+    private void dynamicAnalysis() {
+        String planSql = sqlProvider.getSQLProvidingExecPlan(statementInformation);
+
+        if (planSql == null)
+            return;
+
+        retrieveExecutionPlan(planSql);
+        logExecutionPlan();
+    }
+
+    private void retrieveExecutionPlan(String planSql) {
         Statement statement = null;
         try {
             Connection connection = statementInformation.getConnectionInformation().getConnection();
 
+            if (connection == null)
+                return;
 
             statement = connection.createStatement();
             ResultSet s = statement.executeQuery(planSql);
@@ -62,6 +77,19 @@ class QueryAnalyser {
                 P6LogQuery.error("LEAKING, couldn't close statement for query: " + planSql);
             }
         }
+    }
+
+    private void logExecutionPlan() {
+        if (hasPlanBeenProduced()) {
+            P6LogQuery.getLogger().logText(getPlan());
+        } else {
+            P6LogQuery.getLogger().logText("no plan for " + statementInformation.getSqlWithValues());
+        }
+    }
+
+    private void staticAnalysis() {
+        if (new RegexBadasSQLMatcher().match(statementInformation.getSql()))
+            throw new BadasSQLException("bad because matching regex " + BadasSQLOptions.getProperty(BadasSQLOptions.REGEX1) + "\n" + statementInformation.getSql());
     }
 
     boolean hasPlanBeenProduced() {

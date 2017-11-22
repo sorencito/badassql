@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sf.badassql.BadasSQLFactory;
+import org.sf.badassql.tools.Resetter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -21,6 +22,8 @@ public class H2Test {
 
     @Before
     public void openConnectionAndRedirectStreams() throws ClassNotFoundException, SQLException {
+        Resetter.resetP6();
+
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
 

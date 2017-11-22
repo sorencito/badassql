@@ -51,10 +51,5 @@ public class BadasSQLJdbcEventListener extends SimpleJdbcEventListener {
     private void analyse(StatementInformation statementInformation) {
         QueryAnalyser analyser = new QueryAnalyser(statementInformation);
         analyser.run();
-        if (analyser.hasPlanBeenProduced()) {
-            P6LogQuery.getLogger().logText(analyser.getPlan());
-        } else {
-            P6LogQuery.getLogger().logText("no plan for " + statementInformation.getSqlWithValues());
-        }
     }
 }

@@ -1,11 +1,18 @@
 package org.sf.badassql.tools;
 
 import com.p6spy.engine.spy.P6ModuleManager;
+import org.sf.badassql.BadasSQLOptions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class P6Resetter {
+public class Resetter {
+
+    public static void resetProperties() {
+        System.clearProperty("p6spy.config.regex1");
+        System.clearProperty("p6spy.config.sqlprovider");
+        BadasSQLOptions.resetAll();
+    }
 
     public static void resetP6() {
         Method initMe = null;

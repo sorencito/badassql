@@ -5,6 +5,7 @@ import com.p6spy.engine.common.StatementInformation;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.sf.badassql.tools.Resetter;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -22,6 +23,7 @@ public class QueryAnalyserTest {
 
     @Before
     public void setup() throws SQLException {
+        Resetter.resetP6();
         mockedConnection = mock(Connection.class);
         Statement mockedStatement = mock(Statement.class);
         ResultSet mockedResultSet = mock(ResultSet.class);
