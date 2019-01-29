@@ -3,7 +3,6 @@ package org.sf.badassql.h2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sf.badassql.BadasSQLFactory;
 import org.sf.badassql.tools.Resetter;
 
 import java.io.ByteArrayOutputStream;

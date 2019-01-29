@@ -1,7 +1,6 @@
 package org.sf.badassql;
 
 import com.p6spy.engine.common.CallableStatementInformation;
-import com.p6spy.engine.common.P6LogQuery;
 import com.p6spy.engine.common.PreparedStatementInformation;
 import com.p6spy.engine.common.StatementInformation;
 import com.p6spy.engine.event.SimpleJdbcEventListener;
